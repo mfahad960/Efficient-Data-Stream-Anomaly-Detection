@@ -20,52 +20,12 @@ The project is implemented using **Python 3.x**, with a real-time visualization 
 The **Z-Score** method detects anomalies by calculating how many standard deviations a data point is from the mean of the recent data (stored in a sliding window). If a data point’s Z-Score exceeds a set threshold, it is flagged as an anomaly.
 
 ### Z-Score Formula:
-\[
-Z = \frac{X - \mu}{\sigma}
-\]
+Z= (X−μ)/σ
+​
 Where:
-- \(X\) is the data point,
-- \(\mu\) is the mean of the sliding window,
-- \(\sigma\) is the standard deviation of the sliding window.
-
-The algorithm is effective for detecting spikes or unusual deviations in normally distributed or stationary data, but it may struggle with non-stationary data (concept drift).
-
-## Features
-
-- **Real-Time Data Simulation**: A sine wave with noise and random anomaly injection.
-- **Z-Score Based Anomaly Detection**: Efficient detection of anomalies based on statistical deviation.
-- **Real-Time Visualization**: Continuous plotting of data and marking detected anomalies.
-- **Performance Optimization**: Sliding window implemented with `deque` for efficient rolling window management.
-
-## Installation
-
-To run this project, you need **Python 3.x** and the following libraries:
-
-1. **Numpy** (for mathematical operations)
-2. **Matplotlib** (for real-time plotting)
-
-You can install the required libraries using `pip`:
-
-```bash
-pip install numpy matplotlib
-```
-
-### File Structure
-
-- `main.py`: Contains the main logic for data stream simulation, anomaly detection, and real-time plotting.
-- `README.md`: This file, describing the project setup, usage, and explanation of the algorithm.
-
-## Running the Project
-
-1. Clone the repository or download the project files.
-2. Install the required libraries using `pip`.
-3. Run the `main.py` file using Python:
-
-```bash
-python main.py
-```
-
-This will simulate a real-time data stream and detect anomalies as they occur.
+- "X" is the data point,
+- "μ" is the mean of the sliding window,
+- "σ" is the standard deviation of the sliding window.
 
 ## How It Works
 
@@ -81,9 +41,9 @@ This will simulate a real-time data stream and detect anomalies as they occur.
 
 ### Key Functions
 
-- `generate_data_stream()`: Simulates a continuous data stream with a sine wave and noise. Occasional anomalies are injected.
-- `z_score_algorithm()`: Calculates the Z-Score for a data point and determines if it’s an anomaly.
-- `detect_anomalies()`: Applies the Z-Score algorithm to the data stream and stores the indices of detected anomalies.
+- `generate_data_stream()`: Simulates a continuous, oscillating data stream represented by a sine wave and noise. Occasional anomalies are injected.
+- `z_score_algorithm()`: Calculates the Z-Score for a data point and determines if it is an anomaly.
+- `detect_anomalies()`: Applies the Z-score algorithm to the data stream and stores the indices of detected anomalies.
 - `real_time_plot()`: Plots the data stream in real-time, marking anomalies as red points.
 
 ### Error Handling and Edge Cases
@@ -91,27 +51,14 @@ This will simulate a real-time data stream and detect anomalies as they occur.
 - **Division by Zero**: In case the standard deviation of the window is zero (when all data points are the same), the Z-Score is set to zero, and no anomaly is flagged.
 - **Real-Time Simulation**: Data is streamed with a 0.01-second delay to mimic real-time behavior, handled by `time.sleep()`.
 
-## Customization
+## Optimizations
 
-You can customize several parameters:
-- **Window Size**: The size of the sliding window for the Z-Score calculation.
-- **Threshold**: The Z-Score threshold for flagging anomalies (default is 4).
-- **Anomaly Probability**: The likelihood of injecting an anomaly into the data stream.
+- **Sliding window**: Sliding window implemented with deque for efficient and more performant rolling window management, when using larger window sizes. This is due to deque being O(1) while lists are O(n) when appending or deleting data from the left.
 
-Example:
+- **Window Size**: The optimal size for the window was determined by trail and error. I found 18-24 units to be optimal for this case, and since the data stream is represented by a since wave, it works well in determining shifts apart from seasonal variations in the curve. Unless the the datapoints representing the anomalies are too close. This can be further improved using Exponentially Weighted Moving Average (EWMA) but I found it overkill for the problem at hand and given the choice of data stream simulation.
 
-```python
-data_stream = generate_data_stream(length=5000, scale_factor=3, seasonality=100, noise=0.05, anomaly_probability=0.05)
-processed_stream = detect_anomalies(data_stream, window_size=30, threshold=3)
-```
-
-## Limitations
-
-- **Stationarity**: The Z-Score method assumes the data follows a stationary distribution. It may not adapt well to concept drift or non-stationary data.
-- **Simplicity**: While efficient for simple outlier detection, more complex techniques (e.g., Isolation Forest, LOF) might be needed for advanced anomaly detection scenarios.
+- **Threshold**: The Z-Score threshold for flagging anomalies is set to 4 units, since the anomalies are amplified by a factor of 2. This threshold works for both crests and trough values of the sine curve. I found smaller values to increase false positives, due to random noise and variation of the curve, which is also less efficient, while larger values increased false negetives, overlooking key data values.
 
 ## Future Improvements
 
-- Introduce **adaptive thresholds** to handle concept drift.
-- Experiment with more robust anomaly detection algorithms like **Isolation Forest** or **Autoencoders**.
-- Implement a more advanced **data validation** process to handle different data types.
+- Experiment with more robust anomaly detection algorithms like **Isolation Forest**,  **Autoencoders** or **Exponentially Weighted Moving Average (EWMA)**.
