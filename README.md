@@ -22,6 +22,7 @@ The **Z-Score** method detects anomalies by calculating how many standard deviat
 ### Z-Score Formula:
 Z= (X−μ)/σ
 ​
+
 Where:
 - "X" is the data point,
 - "μ" is the mean of the sliding window,
